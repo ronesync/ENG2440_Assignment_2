@@ -1,0 +1,134 @@
+AI-USE DECLARATION — ENG 2440 Assignment 2
+Student: <NAME> (<STUDENT ID>)
+
+If no AI tool was used, delete everything below and write:
+"I did not use a generative-AI or large-language-model tool for this assignment."
+
+---------------------------------------------------------------------
+Entry 1
+Tool:              Claude
+Date:              2026-10-03
+Purpose:           Time estimate and planning; hardware advice (Colab T4 vs Apple M4);
+                   guidance on citing MONAI; generation of an empty project template
+                   (folder layout, README/report/notebook headings, .gitignore,
+                   environment file). No implementation code or report text was generated.
+Prompts / link:    "give me a template to start with"
+Affected sections: Repository structure, README layout, report section headings
+
+Entry 2
+Tool:              Claude 
+Date:              2026-10-03
+Purpose:           Explained the assignment brief, the random seed, voxel spacing,
+                   "unit of analysis" and voxel/slice/volume/case.
+Prompts / link:    "explain the task and concepts in A1"
+Affected sections: Section 0 (imports, device, seeding); A1; A2
+
+Entry 3
+Tool:              Claude 
+Date:              2026-10-05
+Purpose:           Review of the student's existing notebook cells (Section 0, setup check,
+                   A1, A2) for syntax errors and correctness. Review only; Claude did not
+                   modify the code in this step. Findings reported to the student:
+                   (1) A2 "Orientation" line prints get_best_affine() (an affine matrix),
+                   not orientation codes; nib.aff2axcodes(img.affine) is what the brief
+                   asks for. (2) np.unique(lab.get_fdata()) prints floats; the integer
+                   array via np.asarray(lab.dataobj) is cleaner. (3) Minor style: unused
+                   variables X, Y in A1; double space in "channel_order  =".
+Prompts / link:    "inspect my code grammar"
+Affected sections: Section 0, A1, A2
+
+Entry 4
+Tool:              Claude
+Date:              2026-10-06
+Purpose:           Conceptual explanation of the relationship between physical position
+                   and array index order (affine matrix, orientation codes, spacing,
+                   origin). Explanation only; no code or report text was generated.
+Prompts / link:    "what is the relationship between the position and index order"
+Affected sections: A4 (why index order alone is insufficient)
+
+Entry 5
+Tool:              Claude
+Date:              2026-10-06
+Purpose:           Explanation of why the C4 brightness augmentation was not visible
+                   in the before/after plot (imshow rescales each image to its own
+                   min/max, which cancels a uniform intensity scaling) and a one-line
+                   code fix (fixed vmin/vmax). Also explained the rationale for padding 
+                   to a multiple of 16 (four 2x downsampling steps) and noted that the 
+                   1.1 factor is an untuned, arbitrary choice.
+Prompts / link:    "i dont see the difference between before and after"
+Affected sections: C4
+
+Entry 6
+Tool:              Claude
+Date:              2026-10-07
+Purpose:           Cache help. Measured which data-loading step is slowest (reading and
+                   decompressing the 4-channel .nii.gz image, about 0.24 s of about 0.38 s
+                   per case; normalization about 0.13 s). Advised and implemented a one-time
+                   cache of cropped, normalized train/validation cases as .npy files
+                   (float16 images, uint8 masks, memory-mapped when reading patches),
+                   which removes this cost from every training step. Test cases are not
+                   cached. Tested on a small subset before editing the notebook
+                   (about 33 MB per case; cache build about 0.5 s per case).
+Prompts / link:    "build cache to speed up the training"
+Affected sections: D1 (Dataset reads from the cache), cache cell before D1, D3 (training speed)
+
+
+
+Entry 7
+Tool:              Claude
+Date:              2026-10-13
+Purpose:           Debugging help on two errors the student pasted. (1) F1: AttributeError
+                   "'numpy.ndarray' object has no attribute 'to'" because load_case returned a
+                   NumPy array instead of a float32 tensor; fix: wrap the return in
+                   torch.tensor(..., dtype=torch.float32). (2) F2: KeyError "HD95 (mm)"
+                   caused by a misspelled column key ("H95"); while diagnosing, Claude also
+                   pointed out three further bugs in the student's F2 cell: two rows appended
+                   per case, a parameter typo (red vs ref) in hd95, and np.argwhere making the
+                   surfaces coordinate lists instead of boolean volumes (wrong HD95). Claude
+                   supplied corrected code that recomputes the metrics from the stored
+                   test_preds / test_refs without re-running inference.
+Prompts / link:    pasted tracebacks (AttributeError in sliding_window; KeyError in F2 display)
+Affected sections: F1 (load_case), F2 (hd95 and metrics table)
+
+Entry 8
+Tool:              Claude
+Date:              2026-10-13
+Purpose:           Diagnosis of a missing-variable error ("test_preds not found") in F2. The
+                   student had restructured the F2 cell so that it computed metrics from
+                   test_preds / test_refs, but the loop that creates them (sliding-window
+                   inference on the test set) was no longer in any cell, so a clean run
+                   could not work. Claude restored the inference loop at the top of the F2
+                   cell.
+Prompts / link:    "it still suggests not found. can you take care of it?"
+Affected sections: F2 (and F3, F4, G1 to G3, which depend on it)
+
+
+Entry 9
+Tool:              Claude
+Date:              2026-10-12 to 2026-10-14
+Purpose:           Conceptual explanations the student asked for to understand results:
+                   why the same seed gave different results between two runs (GPU
+                   arithmetic is not fully repeatable, so trajectories diverge; discussed
+                   what reproducibility means and that it is acceptable if reported);
+                   why tumor-aware sampling did not beat uniform sampling (validation
+                   patches are uniform, tumors here are large so uniform patches already
+                   contain tumor 77% of the time, and the 0.02 Dice gap is within run-to-run
+                   variation; these were framed as plausible, untested explanations);
+                   connected components; the reasoning behind the training settings
+                   (iterations, validation interval, learning rate, batch size), which were
+                   described as untuned practical choices.
+Prompts / link:    "why did it give diff results"; "is this a universal prob?";
+                   "why is the tumor aware not performing better than uniform ...";
+                   "what is the largest connected component";
+Affected sections: D3, D4, D5, E1 to E3, F1, F4, G4
+
+
+Entry 10
+Tool:              Claude
+Date:              2026-10-03 to 2026-10-14
+Purpose:           Other help: choice of MONAI versus own code (own model and training code
+                   kept; MONAI not used), keeping the laptop awake during long runs
+                   (caffeinate), explanations of DataLoader, nibabel, spacing, display versus
+                   print, and similar.
+Prompts / link:    "can we import monai directly"; "how can i keep the notebook running while i sleep my laptop"
+Affected sections: Setup, run procedure
