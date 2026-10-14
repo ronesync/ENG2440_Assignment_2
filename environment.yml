@@ -1,0 +1,16 @@
+name: eng2440-a2
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - torch            # pin after install, e.g. torch==2.x.x
+      - monai            # pin after install, e.g. monai==1.x.x
+      - nibabel
+      - numpy
+      - pandas
+      - scipy
+      - matplotlib
+      - tqdm
+      - jupyter
